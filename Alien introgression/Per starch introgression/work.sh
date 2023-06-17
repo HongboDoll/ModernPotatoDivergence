@@ -1,26 +1,5 @@
 #!/bin/bash
 
-####### Dsuite
-awk '{if($2=="Starch"){print $1"\t"$1}else{print $0}}' set.txt > set.txt_per_starch
-rm -rf Dinvestigate_results; mkdir Dinvestigate_results
-cd Dinvestigate_results
-ln -s ../set.txt_per_starch; ln -s ../367_snp_wild_outgroup_23_starch_47_European_4_ABBA.vcf
-grep PG set.txt_per_starch |grep -v Outgroup | awk '{print $2}'|sort | uniq | while read sp
-do
-	grep -v PG set.txt_per_starch|grep -v European | awk '{print $2}'|sort | uniq | while read starch
-	do
-    echo -e "European\t${starch}\t${sp}" > test_trios_${starch}_${sp}.txt
-	echo -e """#!/bin/bash
-	Dsuite  Dinvestigate -w 500,250 367_snp_wild_outgroup_23_starch_47_European_4_ABBA.vcf set.txt_per_starch test_trios_${starch}_${sp}.txt
-	""" > ${starch}_${sp}.sh && chmod 755 ${starch}_${sp}.sh
-	sbatch -J ${starch}_$sp -p gpu-3090 -N 1 --ntasks-per-node=1 -e %x.err -o %x.out "./${starch}_${sp}.sh" ### --nodelist 指定节点运行  login7 login8好像有问题，至少跑NLR-tracker不行
-	done
-done
-cd -
-
-mkdir vernei
-cp Dinvestigate_results/*vernei*localFstats*txt vernei
-
 ls vernei/ | awk -F '.' '{print $1}' | while read i
 do
 
@@ -48,7 +27,7 @@ awk 'NR!=1' European_Kardent_vernei_localFstats__500_250.xls | awk 'BEGIN{OFS="\
 ######## compare introgression proportions bewteen yield-related qtls and R genes
 cat Solanum_tuberosumDM.integratedNLR.gff3|grep NLR|awk '$3=="mRNA"'|cut -f '1,4,5'|grep -v scaffold|sort -k1,1 -k2,2n |bedtools merge -d 1000000 > Solanum_tuberosumDM.integratedNLR_merge_1Mb.bed
 
-ls *__500_250.xls | while read i
+ls *__500_250.xls | grep -v '_Starch_' | while read i
 do
 awk 'NR!=1' $i|cut -f '1-3,6'|awk 'BEGIN{OFS="\t"}{if($4<0){print $1,$2,$3,0}else{print $1,$2,$3,$4}}' | sort -k1,1 -k2,2n > ${i}_fdM.bed
 
@@ -60,16 +39,25 @@ r=`bedtools intersect -wa -a ${i}_fdM.bed -b Solanum_tuberosumDM.integratedNLR_m
 # yield-related qtl introgression proportion; 25qtl, tsc/ty/tsy, 169086141 bp
 yield=`bedtools intersect -wa -a ${i}_fdM.bed -b reported_qtl_gwas_interval_yield.bed | awk '{i+=(($3-$2+1)*$4)}END{print i/"'"$all"'"*100}'`
 
-echo -e "${name}\t${r}\t${yield}"
+# sga-related qtl introgression proportion; 5qtl, sga, 87471277 bp
+sga=`bedtools intersect -wa -a ${i}_fdM.bed -b reported_qtl_gwas_interval_sga.bed | awk '{i+=(($3-$2+1)*$4)}END{print i/"'"$all"'"*100}'`
+echo -e "${name}\t${sga}\t${r}\t${yield}"
 done
 
 ### all 23 starch 
 awk 'NR!=1' European_Starch_vernei_localFstats__500_250.xls|cut -f '1-3,6'|awk 'BEGIN{OFS="\t"}{if($4<0){print $1,$2,$3,0}else{print $1,$2,$3,$4}}' | sort -k1,1 -k2,2n > European_Starch_vernei_localFstats__500_250.xls_fdM.bed
 i=European_Starch_vernei_localFstats__500_250.xls
 all=`cat ${i}_fdM.bed | awk '{i+=(($3-$2+1)*$4)}END{print i}'`
+### 6.35 Mb of the 44.6 Mb NLR regions
 r=`bedtools intersect -wa -a ${i}_fdM.bed -b Solanum_tuberosumDM.integratedNLR_merge_1Mb.bed | awk '{i+=(($3-$2+1)*$4)}END{print i/"'"$all"'"*100}'`
 
+### 8.56 Mb of the 169.1 MB qtl regions
 # yield-related qtl introgression proportion; 25qtl, tsc/ty/tsy, 169086141 bp
 yield=`bedtools intersect -wa -a ${i}_fdM.bed -b reported_qtl_gwas_interval_yield.bed | awk '{i+=(($3-$2+1)*$4)}END{print i/"'"$all"'"*100}'`
 echo -e "23_starch\t${r}\t${yield}"
+
+### 3.81 Mb of the 87.5 Mb qtl regions
+# sga-related qtl introgression proportion; 5qtl, sga, 87471277 bp
+sga=`bedtools intersect -wa -a ${i}_fdM.bed -b reported_qtl_gwas_interval_sga.bed | awk '{i+=(($3-$2+1)*$4)}END{print i/"'"$all"'"*100}'`
+echo -e "23_starch\t${sga}\t${r}\t${yield}"
 
