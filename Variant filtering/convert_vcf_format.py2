@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+
+import sys
+
+i1 = open(sys.argv[1])  # test.vcf2
+
+for line in i1:
+	if '#' in line:
+		print(line.strip())
+	else:
+		line = line.strip().split()
+		print('\t'.join(line[0:7]), '\t.', end='\t', sep='')
+		for n in range(8, len(line)):
+			t = line[n].split(':')
+			if n != (len(line) - 1):
+				print(t[0], end='\t')
+			else:
+				print(t[0], end='\n')
+
