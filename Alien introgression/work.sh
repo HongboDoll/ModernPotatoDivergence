@@ -5,8 +5,8 @@ cd /media/scratchpad_02/li322/work/05_introgression
 #gzip -c -d 166_potato_Allchr.gatk.filter.SNP.filterMissMAF.diploid_genotype.vcf.gz > 166_potato_Allchr.gatk.filter.SNP.filterMissMAF.diploid_genotype.vcf
 
 vcf=166_potato_Allchr.gatk.filter.SNP.filterMissMAF.diploid_genotype.vcf
-retain_samples_in_vcf.py $vcf pop12.xls 2 | gzip > 166_potato_23_starch__47_European_diploid.vcf.gz
-retain_samples_in_vcf.py $vcf pop2_european_4_introgression.xls 2 | gzip > 166_potato_47_European_diploid.vcf.gz
+retain_given_sample_in_vcf.py $vcf pop12.xls 2 | gzip > 166_potato_23_starch__47_European_diploid.vcf.gz
+retain_given_sample_in_vcf.py $vcf pop2_european_4_introgression.xls 2 | gzip > 166_potato_47_European_diploid.vcf.gz
 
 ###### Dsuite
 
