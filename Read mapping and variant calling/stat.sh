@@ -31,13 +31,13 @@ cat pop1_starch.xls pop3_american.xls > pop13.xls
 for i in SNP indel
 do
 echo -e "starch\t${i} private"
-./retain_samples_in_vcf.py 166_potato_Allchr.gatk.filter.${i}.vcf pop23.xls 4|grep -v '#' | awk '{print $1"\t"$2}' | sort -k1,1 -k2,2n > 166_potato_Allchr.gatk.filter.${i}.pop23.xls
+./retain_given_sample_in_vcf.py 166_potato_Allchr.gatk.filter.${i}.vcf pop23.xls 4|grep -v '#' | awk '{print $1"\t"$2}' | sort -k1,1 -k2,2n > 166_potato_Allchr.gatk.filter.${i}.pop23.xls
 
 echo -e "european\t${i} private"
-./retain_samples_in_vcf.py 166_potato_Allchr.gatk.filter.${i}.vcf pop13.xls 4|grep -v '#' | awk '{print $1"\t"$2}' | sort -k1,1 -k2,2n > 166_potato_Allchr.gatk.filter.${i}.pop13.xls
+./retain_given_sample_in_vcf.py 166_potato_Allchr.gatk.filter.${i}.vcf pop13.xls 4|grep -v '#' | awk '{print $1"\t"$2}' | sort -k1,1 -k2,2n > 166_potato_Allchr.gatk.filter.${i}.pop13.xls
 
 echo -e "american\t${i} private"
-./retain_samples_in_vcf.py 166_potato_Allchr.gatk.filter.${i}.vcf pop12.xls 4|grep -v '#' | awk '{print $1"\t"$2}' | sort -k1,1 -k2,2n > 166_potato_Allchr.gatk.filter.${i}.pop12.xls
+./retain_given_sample_in_vcf.py 166_potato_Allchr.gatk.filter.${i}.vcf pop12.xls 4|grep -v '#' | awk '{print $1"\t"$2}' | sort -k1,1 -k2,2n > 166_potato_Allchr.gatk.filter.${i}.pop12.xls
 done
 
 
