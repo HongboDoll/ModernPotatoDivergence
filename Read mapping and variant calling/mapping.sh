@@ -7,7 +7,8 @@ cd /media/scratchpad_01/li322/work/02_137_atlas_potato_reseq
 ###### mapping
 
 bwa index $ref
-gatk CreateSequenceDictionary -R $ref -O ${ref}.dict
+gatk CreateSequenceDictionary -R $ref -O DM_v6.1.dict
+samtools faidx $ref
 
 rm -rf mapping; mkdir mapping
 #!/bin/bash
@@ -20,8 +21,8 @@ do
 	cd /media/scratchpad_01/li322/work/02_137_atlas_potato_reseq
 	
 	fastp -i li/${sample}-${rep}_*R1_001_AH5N5CDSX5.filt.fastq.gz -I li/${sample}-${rep}_*R2_001_AH5N5CDSX5.filt.fastq.gz -o li_rnaseq_fastp/${sample}-${rep}_1.clean.fq.gz -O li_rnaseq_fastp/${sample}-${rep}_2.clean.fq.gz -w 16
-    bwa mem -R \"@RG\\tID:${name}\\tSM:${name}\\tPL:Illumina\" -t $threads $ref <(zcat reseq_data_clean/${i}/*_R1.clean*gz) <(zcat reseq_data_clean/${i}/*_R2.clean*gz) | samtools sort -O bam -@ $threads -m 2G > mapping/${name}.sort.bam 
-    gatk --java-options "-Xmx40G -XX:ParallelGCThreads=$threads" MarkDuplicates -I mapping/${name}.sort.bam -O mapping/${name}.sort.markdup.bam -M mapping/${name}.sort.markdup.metrics.txt
+    bwa mem -R \"@RG\\\tID:${name}\\\tSM:${name}\\\tPL:Illumina\" -t $threads $ref <(zcat reseq_data_clean/${i}/*_R1.clean*gz) <(zcat reseq_data_clean/${i}/*_R2.clean*gz) | samtools sort -O bam -@ $threads -m 2G > mapping/${name}.sort.bam 
+    gatk --java-options \"-Xmx10G -XX:ParallelGCThreads=$threads\" MarkDuplicates -I mapping/${name}.sort.bam -O mapping/${name}.sort.markdup.bam -M mapping/${name}.sort.markdup.metrics.txt
     samtools index mapping/${name}.sort.markdup.bam && rm mapping/${name}.sort.bam
 	""" > mapping_${name}.sh && chmod 755 mapping_${name}.sh
 done
