@@ -28,3 +28,7 @@ If you find these codes useful or you are insterested in our paper, please cite:
 Hongbo Li (lihongbo_solab@163.com)
 
 Richard G. F. Visser (richard.visser@wur.nl)
+
+# :wine_glass: License
+
+MIT
